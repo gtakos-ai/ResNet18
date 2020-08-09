@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Aug  8 17:32:30 2020
+
+@author: gtako
+"""
+
 import keras
 from keras.models import Model
 from keras.layers import Input, merge
@@ -5,6 +12,8 @@ from keras.layers import Dense, Activation, Flatten, BatchNormalization
 from keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D, AveragePooling2D
 from keras.regularizers import l2
 from keras.optimizers import Adam
+from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from sklearn.metrics import confusion_matrix
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -56,10 +65,8 @@ def resnetBlock(inputs,
             activation='relu',
             batchNormalization=True):
 
-
     x = inputs
     for i in range(3):
-        print("Layer = ", i)
         if (i==0):
             res=False
         else:
@@ -88,7 +95,6 @@ def resNet18(input_shape, numClasses=10):
     inputs = Input(shape=input_shape)
     x = firstLayer(inputs, output_filters=output_filters)
     for i in range(depth):
-        print("Depth = ", i)
         if (i>0):
             strides=2
         else:
@@ -185,7 +191,11 @@ EPOCHS = 50
 # Convert class vectors to binary class matrices.
 y_train = keras.utils.to_categorical(y_train, CLASSES_NUM)
 y_test = keras.utils.to_categorical(y_test, CLASSES_NUM)
-    
+ 
+callbacks = [
+    EarlyStopping(patience=30, verbose=1),
+    ReduceLROnPlateau(factor=0.3, patience=5, min_lr=0.000001, verbose=1)]  
+
 model = resNet18(input_shape=input_shape, numClasses=CLASSES_NUM)
 model.compile(loss='categorical_crossentropy',
               optimizer=Adam(learning_rate=LEARNING_RATE),
@@ -193,8 +203,8 @@ model.compile(loss='categorical_crossentropy',
 model.summary()
 
 model_history = model.fit(x_train, y_train,
-              batch_size=batch_size,
-              epochs=epochs,
+              batch_size=BATCH_SIZE,
+              epochs=EPOCHS,
               validation_data=(x_test, y_test),
               callbacks=callbacks,
               shuffle=True)
@@ -237,7 +247,10 @@ predicted = model.predict(x_test)
 y_pred = np.argmax(predicted, axis=1)
 cm = confusion_matrix(y_true, y_pred)
 print(cm)
-sns.heatmap(cm, annot=True)
+sns.heatmap(np.round(100*cm/np.sum(cm, axis=0)), annot=True)
+plt.title("Confusion Matrix (percentages)")
+plt.xlabel('True Labels')
+plt.xlabel('Predicted Labels')
 plt.show()
 
 # histogram of predicted and actual data
