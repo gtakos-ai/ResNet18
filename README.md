@@ -4,10 +4,9 @@ A Keras implementation of
 
 ### Cifar10 Example
 
-Trained on [cifar10](https://www.cs.toronto.edu/~kriz/cifar.html) data. Accuracy was ~84%.
+Trained on [cifar10](https://www.cs.toronto.edu/~kriz/cifar.html) data. Accuracy was ~88% with image augmentation and ~83% without.
 
 ### Plots
 
-![GitHub Logo](/plots/accuracy.png)
 ![GitHub Logo](/plots/validation_accuracy.png)
 ![GitHub Logo](/plots/normalized_confusion_matrix.png)
