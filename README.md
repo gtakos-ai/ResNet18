@@ -4,7 +4,7 @@ A Keras implementation of
 
 ### Cifar10 Example
 
-Trained on [cifar10](https://www.cs.toronto.edu/~kriz/cifar.html) data. Accuracy was 83%.
+Trained on [cifar10](https://www.cs.toronto.edu/~kriz/cifar.html) data. Accuracy was ~84%.
 
 ### Plots
 
