@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Aug  8 17:32:30 2020
-
-@author: gtako
-"""
-
 import keras
 from keras.models import Model
 from keras.layers import Input, merge
