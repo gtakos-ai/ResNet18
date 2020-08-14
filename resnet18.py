@@ -166,7 +166,49 @@ def load_cifar_10_data(data_dir, negatives=False):
     return cifar_train_data, cifar_train_filenames, cifar_train_labels, \
         cifar_test_data, cifar_test_filenames, cifar_test_labels, cifar_label_names
   
-            
+def add_gaussian_noise(X_imgs):
+    gaussian_noise_imgs = []
+    row, col, _ = X_imgs[0].shape
+    # Gaussian distribution parameters
+    mean = 0
+    var = 0.1
+    sigma = var ** 0.5
+    
+    for X_img in X_imgs:
+        gaussian = np.random.random((row, col, 1)).astype(np.float32)
+        gaussian = np.concatenate((gaussian, gaussian, gaussian), axis = 2)
+        gaussian_img = cv2.addWeighted(X_img, 0.75, 0.25 * gaussian, 0.25, 0)
+        gaussian_noise_imgs.append(gaussian_img)
+    gaussian_noise_imgs = np.array(gaussian_noise_imgs, dtype = np.float32)
+    return gaussian_noise_imgs
+
+def flip(X_imgs):
+    flip_imgs = []
+    row, col, _ = X_imgs[0].shape 
+    for X_img in X_imgs:
+        img2 = np.fliplr(X_img)
+        flip_imgs.append(img2)
+    flip_imgs = np.array(flip_imgs, dtype = np.float32)
+    return flip_imgs
+
+def rotate(X_imgs):
+    rotate_imgs = []
+    row, col, _ = X_imgs[0].shape 
+    for X_img in X_imgs:
+        img2 = ndimage.rotate(X_img, (random()-1)*180, reshape=False)
+        rotate_imgs.append(img2)
+    rotate_imgs = np.array(rotate_imgs, dtype = np.float32)
+    return rotate_imgs 
+
+def data_augmentation(x_train, y_train):
+    gaussian_noise_imgs = add_gaussian_noise(x_train)
+    flip_imgs = flip(x_train)
+    rotate_imgs = rotate(x_train)
+    rotate_imgs2 = rotate(flip_imgs)
+    x = np.concatenate((x_train, gaussian_noise_imgs, flip_imgs, rotate_imgs, rotate_imgs2), axis=0)
+    y = np.concatenate((y_train, y_train, y_train, y_train, y_train), axis=0)
+    return x, y    
+
 #data directory           
 cifar_10_dir = 'datasets/cifar10/cifar-10-batches-py'
 #training and test data
@@ -184,7 +226,10 @@ EPOCHS = 50
 # Convert class vectors to binary class matrices.
 y_train = keras.utils.to_categorical(y_train, CLASSES_NUM)
 y_test = keras.utils.to_categorical(y_test, CLASSES_NUM)
- 
+             
+#data augmentation
+x_train, y_train = data_augmentation(x_train, y_train)
+
 callbacks = [
     EarlyStopping(patience=30, verbose=1),
     ReduceLROnPlateau(factor=0.3, patience=5, min_lr=0.000001, verbose=1)]  
