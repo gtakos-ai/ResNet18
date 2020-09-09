@@ -10,3 +10,5 @@ Trained on [cifar10](https://www.cs.toronto.edu/~kriz/cifar.html) data. Accuracy
 
 ![GitHub Logo](/plots/validation_accuracy.png)
 ![GitHub Logo](/plots/normalized_confusion_matrix.png)
+
+
